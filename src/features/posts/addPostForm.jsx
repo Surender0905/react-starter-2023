@@ -11,17 +11,22 @@ const AddPostForm = () => {
     content: "",
     userId: "",
   });
-
-  console.log(input);
+  const [addRequestStatus, setAddRequestStatus] = useState("idle");
 
   const { title, content, userId } = input;
+
+  const canSave =
+    [title, content, userId].every(Boolean) && addRequestStatus === "idle";
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (title && content && userId) {
-      dispatch(postAdded(title, content, userId));
+    if (canSave) {
+      setAddRequestStatus("pending");
+      dispatch(postAdded(title, content, userId)).unwrap();
     }
 
     setInput({ title: "", content: "", userId: "" });
+    setAddRequestStatus("idle");
   };
 
   const usersOption = users.map((user) => (
@@ -30,7 +35,6 @@ const AddPostForm = () => {
     </option>
   ));
 
-  const canSave = Boolean(title) && Boolean(content) && Boolean(userId);
   return (
     <div>
       <form
